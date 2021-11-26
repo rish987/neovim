@@ -15,7 +15,7 @@ end
 
 ---@private
 local function query_definition(pattern)
-  local params = lsp.util.make_position_params()
+  local params = util.make_position_params(0, util._get_offset_encoding(0))
   local results_by_client, err = lsp.buf_request_sync(0, 'textDocument/definition', params, 1000)
   if err then
     return {}

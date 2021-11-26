@@ -57,7 +57,7 @@ end
 --- Displays hover information about the symbol under the cursor in a floating
 --- window. Calling the function twice will jump into the floating window.
 function M.hover()
-  local params = util.make_position_params()
+  local params = util.make_position_params(0, util._get_offset_encoding(0))
   request('textDocument/hover', params)
 end
 
@@ -65,35 +65,35 @@ end
 ---@note Many servers do not implement this method. Generally, see |vim.lsp.buf.definition()| instead.
 ---
 function M.declaration()
-  local params = util.make_position_params()
+  local params = util.make_position_params(0, util._get_offset_encoding(0))
   request('textDocument/declaration', params)
 end
 
 --- Jumps to the definition of the symbol under the cursor.
 ---
 function M.definition()
-  local params = util.make_position_params()
+  local params = util.make_position_params(0, util._get_offset_encoding(0))
   request('textDocument/definition', params)
 end
 
 --- Jumps to the definition of the type of the symbol under the cursor.
 ---
 function M.type_definition()
-  local params = util.make_position_params()
+  local params = util.make_position_params(0, util._get_offset_encoding(0))
   request('textDocument/typeDefinition', params)
 end
 
 --- Lists all the implementations for the symbol under the cursor in the
 --- quickfix window.
 function M.implementation()
-  local params = util.make_position_params()
+  local params = util.make_position_params(0, util._get_offset_encoding(0))
   request('textDocument/implementation', params)
 end
 
 --- Displays signature information about the symbol under the cursor in a
 --- floating window.
 function M.signature_help()
-  local params = util.make_position_params()
+  local params = util.make_position_params(0, util._get_offset_encoding(0))
   request('textDocument/signatureHelp', params)
 end
 
@@ -106,7 +106,7 @@ end
 ---
 ---@see |vim.lsp.protocol.constants.CompletionTriggerKind|
 function M.completion(context)
-  local params = util.make_position_params()
+  local params = util.make_position_params(0, util._get_offset_encoding(0))
   params.context = context
   return request('textDocument/completion', params)
 end
@@ -256,7 +256,7 @@ function M.rename(new_name)
   ---@private
   local function on_confirm(input)
     if not (input and #input > 0) then return end
-    local params = util.make_position_params()
+    local params = util.make_position_params(0, util._get_offset_encoding(0))
     params.newName = input
     request('textDocument/rename', params)
   end
@@ -288,7 +288,8 @@ function M.rename(new_name)
     end
     if new_name then on_confirm(new_name) end
   end
-  request('textDocument/prepareRename', util.make_position_params(), prepare_rename)
+  local params = util.make_position_params(0, util._get_offset_encoding(0))
+  request('textDocument/prepareRename', params, prepare_rename)
 end
 
 --- Lists all the references to the symbol under the cursor in the quickfix window.
@@ -297,7 +298,7 @@ end
 ---@see https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_references
 function M.references(context)
   validate { context = { context, 't', true } }
-  local params = util.make_position_params()
+  local params = util.make_position_params(0, util._get_offset_encoding(0))
   params.context = context or {
     includeDeclaration = true;
   }
@@ -331,7 +332,7 @@ end
 
 ---@private
 local function call_hierarchy(method)
-  local params = util.make_position_params()
+  local params = util.make_position_params(0, util._get_offset_encoding(0))
   request('textDocument/prepareCallHierarchy', params, function(err, result, ctx)
     if err then
       vim.notify(err.message, vim.log.levels.WARN)
@@ -455,7 +456,7 @@ end
 ---         |LspReferenceRead|
 ---         |LspReferenceWrite|
 function M.document_highlight()
-  local params = util.make_position_params()
+  local params = util.make_position_params(0, util._get_offset_encoding(0))
   request('textDocument/documentHighlight', params)
 end
 
@@ -582,7 +583,7 @@ function M.code_action(context)
   if not context.diagnostics then
     context.diagnostics = vim.lsp.diagnostic.get_line_diagnostics()
   end
-  local params = util.make_range_params()
+  local params = util.make_range_params(0, util._get_offset_encoding(0))
   params.context = context
   code_action_request(params)
 end
@@ -608,7 +609,7 @@ function M.range_code_action(context, start_pos, end_pos)
   if not context.diagnostics then
     context.diagnostics = vim.lsp.diagnostic.get_line_diagnostics()
   end
-  local params = util.make_given_range_params(start_pos, end_pos)
+  local params = util.make_given_range_params(start_pos, end_pos, 0, util._get_offset_encoding(0))
   params.context = context
   code_action_request(params)
 end
